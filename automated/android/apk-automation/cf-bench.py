@@ -19,10 +19,13 @@ class ApkRunnerImpl(ApkTestRunner):
             time.sleep(2)
             self.dump_always()
             warn_msg = self.vc.findViewWithText(u'This app was built for an older version of Android and may not work properly. Try checking for updates, or contact the developer.')
+            continue_btn = self.vc.findViewWithText(u'CONTINUE')
             if warn_msg:
                 self.logger.info("Older version warning popped up")
                 warning_ok_btn = self.vc.findViewWithTextOrRaise(u'OK')
                 warning_ok_btn.touch()
+            elif continue_btn:
+                continue_btn.touch()
             else:
                 # Start test button
                 start_button = self.vc.findViewWithTextOrRaise("Full Benchmark")
@@ -63,7 +66,7 @@ class ApkRunnerImpl(ApkTestRunner):
                     found_score_view = True
 
             score_uid = score_view.getUniqueId()
-            uid = int(re.search("id/no_id/(?P<uid>\d+)", score_uid).group('uid'))
+            uid = int(re.search(r"id/no_id/(?P<uid>\d+)", score_uid).group('uid'))
             score = self.vc.findViewByIdOrRaise("id/no_id/%s" % (uid + offset))
             score_text = score.getText()
             if score_text.find("%") > 0:

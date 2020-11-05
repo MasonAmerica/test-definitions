@@ -1,6 +1,6 @@
 metadata:
     name: rt-migrate-test
-    format: "Lava-Test-Shell Test Definition 1.0"
+    format: "Lava-Test Test Definition 1.0"
     description: "rt-migrate-test verifies the RT threads scheduler balancing."
     maintainer:
         - chase.qi@linaro.org
@@ -25,11 +25,15 @@ metadata:
         - d05
 
 params:
-    # Number of loops.
-    LOOPS: "100"
+    # Priority of lowest prio thread (3 threads are created).
+    PRIORITY: "96"
+    # Execute rt-migrate-test for given time
+    DURATION: "5m"
+    # Background workload to be run during the meassurement
+    BACKGROUND_CMD: ""
 
 run:
     steps:
         - cd ./automated/linux/rt-migrate-test/
-        - ./rt-migrate-test.sh -l "${LOOPS}"
+        - ./rt-migrate-test.sh -p "${PRIORITY}" -D "${DURATION}" -w "${BACKGROUND_CMD}"
         - ../../utils/send-to-lava.sh ./output/result.txt

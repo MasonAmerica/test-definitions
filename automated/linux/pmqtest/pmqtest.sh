@@ -8,16 +8,18 @@ TEST_DIR=$(dirname "$(realpath "$0")")
 OUTPUT="${TEST_DIR}/output"
 LOGFILE="${OUTPUT}/pmqtest.log"
 RESULT_FILE="${OUTPUT}/result.txt"
-LOOPS="10000"
+DURATION="5m"
+BACKGROUND_CMD=""
 
 usage() {
-    echo "Usage: $0 [-l loops]" 1>&2
+    echo "Usage: $0 [-D duration] [-w background_cmd]" 1>&2
     exit 1
 }
 
-while getopts ":l:" opt; do
+while getopts ":D:w:" opt; do
     case "${opt}" in
-        l) LOOPS="${OPTARG}" ;;
+        D) DURATION="${OPTARG}" ;;
+	w) BACKGROUND_CMD="${OPTARG}" ;;
         *) usage ;;
     esac
 done
@@ -28,18 +30,18 @@ done
 create_out_dir "${OUTPUT}"
 
 # Run pmqtest.
-if ! binary=$(which pmqtest); then
+if ! binary=$(command -v pmqtest); then
     detect_abi
     # shellcheck disable=SC2154
     binary="./bin/${abi}/pmqtest"
 fi
 
-"${binary}" -S -l "${LOOPS}" | tee "${LOGFILE}"
+background_process_start bgcmd --cmd "${BACKGROUND_CMD}"
+
+"${binary}" -S -p 98 -D "${DURATION}" | tee "${LOGFILE}"
+
+background_process_stop bgcmd
 
 # Parse test log.
-tail -n "$(nproc)" "${LOGFILE}" \
-    | sed 's/,//g' \
-    | awk '{printf("t%s-min-latency pass %s us\n", NR, $(NF-6))};
-           {printf("t%s-avg-latency pass %s us\n", NR, $(NF-2))};
-           {printf("t%s-max-latency pass %s us\n", NR, $NF)};'  \
+../../lib/parse_rt_tests_results.py pmqtest "${LOGFILE}" \
     | tee -a "${RESULT_FILE}"

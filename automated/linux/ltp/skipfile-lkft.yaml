@@ -34,6 +34,7 @@ skiplist:
       - qemu_arm
       - qemu_i386
       - i386
+      - nxp-ls2088
     branches: all
     tests:
       - fork13
@@ -55,6 +56,7 @@ skiplist:
       - qemu_arm
       - qemu_i386
       - i386
+      - nxp-ls2088
     branches: all
     tests:
       - msgctl10
@@ -73,12 +75,18 @@ skiplist:
       - dragonboard-410c
       - rzn1d
       - qemu_arm64
+      - nxp-ls2088
     branches:
       - 4.4
       - 4.9
+      - linux-4.4.y
+      - linux-4.9.y
+      - v4.4-rt
+      - v4.9-rt
     tests:
       - fanotify07
       - fanotify08
+      - fanotify09
 
   - reason: >
       LKFT: LTP: inotify07 FAIL: didn't get event: mask=40000004
@@ -89,6 +97,10 @@ skiplist:
     branches:
       - 4.4
       - 4.9
+      - linux-4.4.y
+      - linux-4.9.y
+      - v4.4-rt
+      - v4.9-rt
     tests:
       - inotify07
 
@@ -102,6 +114,12 @@ skiplist:
       - 4.4
       - 4.9
       - 4.14
+      - linux-4.4.y
+      - linux-4.9.y
+      - linux-4.14.y
+      - v4.4-rt
+      - v4.9-rt
+      - v4.14-rt
     tests:
       - inotify08
 
@@ -117,6 +135,7 @@ skiplist:
       - qemu_arm64
       - qemu_arm
       - i386
+      - nxp-ls2088
     branches: all
     tests:
       - pth_str01
@@ -170,6 +189,7 @@ skiplist:
       - hi6220-hikey
       - dragonboard-410c
       - rzn1d
+      - nxp-ls2088
     branches:
       - all
     tests:
@@ -198,6 +218,7 @@ skiplist:
     boards:
       - dragonboard-410c
       - rzn1d
+      - nxp-ls2088
     branches:
       - all
     tests:
@@ -214,6 +235,7 @@ skiplist:
       - hi6220-hikey
       - juno-r2
       - qemu_arm64
+      - nxp-ls2088
     branches:
       - all
     tests:
@@ -228,6 +250,7 @@ skiplist:
     boards:
       - dragonboard-410c
       - rzn1d
+      - nxp-ls2088
     branches:
       - all
     tests:
@@ -261,6 +284,7 @@ skiplist:
     boards:
       - dragonboard-410c
       - rzn1d
+      - nxp-ls2088
     branches:
       - all
     tests:
@@ -273,3 +297,14 @@ skiplist:
       - dio22
       - dio23
       - dio26
+
+  - reason: >
+      skip long running LTP memcg_stress_test on all devices
+    url: https://bugs.linaro.org/show_bug.cgi?id=5657
+    environments: production
+    boards:
+      - all
+    branches:
+      - all
+    tests:
+      - memcg_stress

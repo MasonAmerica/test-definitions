@@ -8,16 +8,20 @@ RESULT_FILE="${OUTPUT}/result.txt"
 RESULT_LOG="${OUTPUT}/result_log.txt"
 SKIP_INSTALL="false"
 SMP="true"
+GIT_REF="master"
 
 usage() {
-    echo "Usage: $0 [-s <true|false>] [-m <true|false>]" 1>&2
+    echo "Usage: $0 [-s <true|false>]
+                    [-m <true|false>]
+                    [-g git-reference]" 1>&2
     exit 1
 }
 
-while getopts "s:m:h" o; do
+while getopts "s:m:g:h" o; do
   case "$o" in
     s) SKIP_INSTALL="${OPTARG}" ;;
     m) SMP="${OPTARG}" ;;
+    g) GIT_REF="${OPTARG}" ;;
     h|*) usage ;;
   esac
 done
@@ -40,17 +44,23 @@ parse_output() {
 kvm_unit_tests_run_test() {
     info_msg "running kvm unit tests ..."
     if [ "${SMP}" = "false" ]; then
-        taskset -c 0 ./run_tests.sh -v | tee -a "${RESULT_LOG}"
+        taskset -c 0 ./run_tests.sh -a -v | tee -a "${RESULT_LOG}"
     else
-        ./run_tests.sh -v | tee -a "${RESULT_LOG}"
+        ./run_tests.sh -a -v | tee -a "${RESULT_LOG}"
     fi
 }
 
 kvm_unit_tests_build_test() {
     info_msg "git clone kvm unit tests ..."
-    git clone https://git.kernel.org/pub/scm/virt/kvm/kvm-unit-tests.git --depth 1
-    # shellcheck disable=SC2164
-    cd kvm-unit-tests
+    git clone https://gitlab.com/kvm-unit-tests/kvm-unit-tests.git
+    cd kvm-unit-tests || error_msg "Wasn't able to clone repo kvm-unit-tests!"
+    info_msg "Checkout on a given git reference ${GIT_REF}"
+    git checkout "${GIT_REF}"
+    retval=$?
+    if [ $retval -ne 0 ]; then
+        error_msg "SHA or branch: ${GIT_REF} not found!"
+    fi
+
     info_msg "configure kvm unit tests ..."
     ./configure
     info_msg "make kvm unit tests ..."

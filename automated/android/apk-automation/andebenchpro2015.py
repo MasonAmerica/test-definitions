@@ -35,8 +35,8 @@ class ApkRunnerImpl(ApkTestRunner):
                       "Overall Score",
                       "Verify"]
 
-        pat_score = re.compile("^(?P<measurement>[\d\.]+)$")
-        pat_score_unit_str = "^(?P<measurement>[\d\.]+)(?P<units>[^\d\.]+)$"
+        pat_score = re.compile(r"^(?P<measurement>[\d\.]+)$")
+        pat_score_unit_str = r"^(?P<measurement>[\d\.]+)(?P<units>[^\d\.]+)$"
         pat_score_unit = re.compile(pat_score_unit_str)
 
         with open(local_result_csv, 'r') as f:
@@ -79,6 +79,18 @@ class ApkRunnerImpl(ApkTestRunner):
     def execute(self):
         # Enable 64-bit
         time.sleep(10)
+
+        self.dump_always()
+        continue_btn = self.vc.findViewWithText(u'CONTINUE')
+        if continue_btn:
+            continue_btn.touch()
+
+        self.dump_always()
+        warn_msg = self.vc.findViewWithText(u'This app was built for an older version of Android and may not work properly. Try checking for updates, or contact the developer.')
+        if warn_msg:
+            self.logger.info("Older version warning popped up")
+            warning_ok_btn = self.vc.findViewWithTextOrRaise(u'OK')
+            warning_ok_btn.touch()
 
         self.dump_always()
         btn_license = self.vc.findViewWithText(u'I Agree')

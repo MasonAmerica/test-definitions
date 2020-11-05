@@ -1,6 +1,6 @@
 metadata:
     name: signaltest
-    format: "Lava-Test-Shell Test Definition 1.0"
+    format: "Lava-Test Test Definition 1.0"
     description: "signaltest is a RT signal roundtrip test software."
 
     maintainer:
@@ -27,14 +27,15 @@ metadata:
 
 params:
     # Priority of highest prio thread.
-    PRIORITY: "99"
+    PRIORITY: "98"
     # Number of threads.
     THREADS: "2"
-    # Number of loops.
-    LOOPS: "100000"
+    DURATION: "1m"
+    # Background workload to be run during the meassurement
+    BACKGROUND_CMD: ""
 
 run:
     steps:
         - cd ./automated/linux/signaltest
-        - ./signaltest.sh -p "${PRIORITY}" -t "${THREADS}" -l "${LOOPS}"
+        - ./signaltest.sh -D "${DURATION}" -p "${PRIORITY}" -t "${THREADS}" -w "${BACKGROUND_CMD}"
         - ../../utils/send-to-lava.sh ./output/result.txt

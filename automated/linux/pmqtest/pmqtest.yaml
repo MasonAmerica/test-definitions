@@ -1,6 +1,6 @@
 metadata:
     name: pmqtest
-    format: "Lava-Test-Shell Test Definition 1.0"
+    format: "Lava-Test Test Definition 1.0"
     description: "Pmqtest measures the latency of interprocess communication
                   with POSIX messages queues. The test starts pairs of threads
                   that are synchronized via mq_send/mw_receive() and measures
@@ -26,10 +26,12 @@ metadata:
         - d05
 
 params:
-    LOOPS: 10000
+    DURATION: "5m"
+    # Background workload to be run during the meassurement
+    BACKGROUND_CMD: ""
 
 run:
     steps:
         - cd ./automated/linux/pmqtest/
-        - ./pmqtest.sh -l "${LOOPS}"
+        - ./pmqtest.sh -D "${DURATION}" -w "${BACKGROUND_CMD}"
         - ../../utils/send-to-lava.sh ./output/result.txt
